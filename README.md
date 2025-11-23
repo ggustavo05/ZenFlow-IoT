@@ -413,3 +413,8 @@ http://localhost:1880
 
    ---
    ## 👥 Equipe
+| Nome               | RM     |
+| ------------------ | ------ |
+| Amanda Galdino     | 560066 |
+| Bruno Cantacini    | 560242 |
+| Gustavo Gonçalves | 556823 |
