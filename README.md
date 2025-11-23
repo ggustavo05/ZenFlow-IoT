@@ -6,7 +6,7 @@
 Se tiver um banner, troque o caminho abaixo, por exemplo:
 ![ZenFlow Sense Banner](docs/assets/zenflow-banner.png)
 -->
-![ZenFlow Sense Banner](docs/assets/zenflow-banner.png)
+![Logo ZenFlow](https://drive.google.com/uc?export=view&id=1QZ5OrgmxkSRhUeOyufPQ0KDM32LUoNCb)
 
 ---
 
@@ -271,7 +271,7 @@ Na simulação Wokwi, o hardware do **ZenFlow Sense** é composto por:
   - Um lado do botão → `GND`
   - Outro lado → GPIO (`12`, `13`, `14`)
 
-![Montagem do hardware no Wokwi](docs/assets/hardware-zenflow-sense.jpg)
+![Montagem do hardware no Wokwi](https://drive.google.com/uc?export=view&id=1jkfXLGqpHiCBjlERcXvp6dTtzjSb5pY7)
 
 
 ## 📋 Requisitos técnicos da disciplina
@@ -330,6 +330,8 @@ Além disso, a solução está integrada à ideia central do **ZenFlow** (bem-es
 
 - **Git & GitHub** – versionamento e hospedagem do código e documentação.
 - **Google Drive / Imagens** – armazenamento da logo e screenshots para o README.
+
+![Fluxo Node-RED do ZenFlow Sense](https://drive.google.com/uc?export=view&id=1PHlt9S-yrgM4ZIkRlMavVgJGR-asS4PI)
 
 ## 🚀 Como executar o projeto
 
@@ -410,6 +412,9 @@ http://localhost:1880
    ``` text
    http://localhost:1880/ui
    ```
+---
+
+![Dashboard ZenFlow Sense](https://drive.google.com/uc?export=view&id=1nCJm2WDT90d-pfDikJPmTZEfcKjzYr3U)
 
    ---
    ## 👥 Equipe
