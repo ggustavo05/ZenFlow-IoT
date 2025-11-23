@@ -1,0 +1,439 @@
+[
+    {
+        "id": "112a1448c1903990",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "ca63b782efcafe0d",
+        "type": "mqtt in",
+        "z": "112a1448c1903990",
+        "name": "MQTT ZenFlow",
+        "topic": "zenflow/estacoes/EST01",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "d2a1f8e36c2ccb7b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 160,
+        "y": 260,
+        "wires": [
+            [
+                "72b20c7c6b421963"
+            ]
+        ]
+    },
+    {
+        "id": "72b20c7c6b421963",
+        "type": "json",
+        "z": "112a1448c1903990",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 350,
+        "y": 260,
+        "wires": [
+            [
+                "4a8ab6738566089e",
+                "cf30110161aa523f"
+            ]
+        ]
+    },
+    {
+        "id": "4a8ab6738566089e",
+        "type": "debug",
+        "z": "112a1448c1903990",
+        "name": "debug 1",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 560,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "cf30110161aa523f",
+        "type": "function",
+        "z": "112a1448c1903990",
+        "name": "function 1Processa leitura / índice de bem-estar",
+        "func": "// Garante que o payload seja um OBJETO, não string\nlet data = msg.payload;\n\nif (typeof data === \"string\") {\n    try {\n        data = JSON.parse(data);\n    } catch (e) {\n        node.error(\"Payload não é JSON válido: \" + msg.payload, msg);\n        return null;\n    }\n}\n\n// índice base dependendo do humor\nlet indice = 70; // neutro\n\nif (data.humor === \"bem\") {\n    indice = 90;\n} else if (data.humor === \"estressado\") {\n    indice = 40;\n}\n\n// Ajuste por temperatura (ideal 20 a 26)\nif (data.temperatura < 20 || data.temperatura > 26) {\n    indice -= 10;\n}\n\n// Ajuste por umidade (ideal 30 a 70)\nif (data.umidade < 30 || data.umidade > 70) {\n    indice -= 5;\n}\n\n// Limites 0–100\nif (indice < 0) indice = 0;\nif (indice > 100) indice = 100;\n\n// adiciona no objeto\ndata.indiceBemEstar = indice;\n\n// devolve payload completo como objeto\nmsg.payload = data;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 260,
+        "wires": [
+            [
+                "c1f77fb83b4db6a7",
+                "ecb6ebe71c201e49",
+                "fe8d7eed30212410",
+                "8ab0920d590f481a",
+                "653802da8c1c761f",
+                "10ad2e6e238be180"
+            ]
+        ]
+    },
+    {
+        "id": "c1f77fb83b4db6a7",
+        "type": "debug",
+        "z": "112a1448c1903990",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1000,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "4227e2e09d35ab5a",
+        "type": "ui_gauge",
+        "z": "112a1448c1903990",
+        "name": "",
+        "group": "ef923aff10be72e7",
+        "order": 2,
+        "width": "6",
+        "height": "4",
+        "gtype": "donut",
+        "title": "Índice de Bem-Estar",
+        "label": "%",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#d1232c",
+            "#e6e600",
+            "#4cde17"
+        ],
+        "seg1": "50",
+        "seg2": "80",
+        "diff": false,
+        "className": "",
+        "x": 1480,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "ecb6ebe71c201e49",
+        "type": "function",
+        "z": "112a1448c1903990",
+        "name": "Function Índice Gauge",
+        "func": "// pega apenas o índice do objeto e manda no payload\nmsg.payload = msg.payload.indiceBemEstar;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1060,
+        "y": 340,
+        "wires": [
+            [
+                "4227e2e09d35ab5a"
+            ]
+        ]
+    },
+    {
+        "id": "fe8d7eed30212410",
+        "type": "function",
+        "z": "112a1448c1903990",
+        "name": "Function Temperatura",
+        "func": "// Garante que o payload é o objeto vindo da Processa leitura\nlet data = msg.payload;\n\n// Pega só a temperatura\nmsg.payload = data.temperatura;  // ex.: 5.5\n\n// Define um topic (opcional, mas bom pra chart)\nmsg.topic = \"Temperatura\";\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1060,
+        "y": 420,
+        "wires": [
+            [
+                "5b014f456743f7cc",
+                "02b32b7eeb88d7ee"
+            ]
+        ]
+    },
+    {
+        "id": "5b014f456743f7cc",
+        "type": "debug",
+        "z": "112a1448c1903990",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1380,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "8ab0920d590f481a",
+        "type": "function",
+        "z": "112a1448c1903990",
+        "name": "Function Umidade",
+        "func": "let data = msg.payload;\nmsg.payload = data.umidade;   \nmsg.topic = \"Umidade\";\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1050,
+        "y": 140,
+        "wires": [
+            [
+                "02b32b7eeb88d7ee"
+            ]
+        ]
+    },
+    {
+        "id": "10ad2e6e238be180",
+        "type": "function",
+        "z": "112a1448c1903990",
+        "name": "Function Humor",
+        "func": "let data = msg.payload;\nmsg.payload = data.humor;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1060,
+        "y": 540,
+        "wires": [
+            [
+                "ac715c07ef67ba71"
+            ]
+        ]
+    },
+    {
+        "id": "ac715c07ef67ba71",
+        "type": "ui_text",
+        "z": "112a1448c1903990",
+        "group": "92689d23bc0157c9",
+        "order": 2,
+        "width": "6",
+        "height": "2",
+        "name": "",
+        "label": "Humor atual",
+        "format": "{{msg.payload}}",
+        "layout": "col-center",
+        "className": "",
+        "style": true,
+        "font": "Arial,Arial,Helvetica,sans-serif",
+        "fontSize": "30",
+        "color": "#2e2d2d",
+        "x": 1410,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "d2866d2806954f3c",
+        "type": "ui_template",
+        "z": "112a1448c1903990",
+        "group": "92689d23bc0157c9",
+        "name": "Header",
+        "order": 1,
+        "width": "6",
+        "height": "3",
+        "format": "<div class=\"zen-header\">\n    \n    <div class=\"zen-title\">\n        <h2>ZenFlow Sense</h2>\n        <p>Estação de Bem-Estar no Trabalho</p>\n    </div>\n</div>\n\n<style>\n    .zen-header {\n        display: flex;\n        align-items: center;\n        gap: 12px;\n        padding: 12px 16px;\n        align-items: center;\n    }\n\n    .zen-logo {\n        height: 40px;\n        /* ajusta o tamanho aqui */\n    }\n\n    .zen-title h2 {\n        margin: 0;\n        font-weight: 600;\n    }\n\n    .zen-title p {\n        margin: 0;\n        font-size: 0.9rem;\n        opacity: 0.8;\n    }\n</style>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1380,
+        "y": 660,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "653802da8c1c761f",
+        "type": "function",
+        "z": "112a1448c1903990",
+        "name": "function StatusAmbiente",
+        "func": "let data = msg.payload;\nlet humor = data.humor; // \"bem\", \"neutro\", \"estressado\"\n\nlet statusText = \"\";\nlet statusDesc = \"\";\nlet color = \"\";\n\nif (humor === \"bem\") {\n    statusText = \"Ambiente Positivo\";\n    statusDesc = \"✓ Colaboradores se sentindo bem\";\n    color = \"#22c55e\"; // verde\n} else if (humor === \"neutro\") {\n    statusText = \"Ambiente Neutro\";\n    statusDesc = \"• Condições estáveis, monitorar\";\n    color = \"#eab308\"; // amarelo\n} else if (humor === \"estressado\") {\n    statusText = \"Alerta de Estresse\";\n    statusDesc = \"⚠ Muitos registros de estresse\";\n    color = \"#ef4444\"; // vermelho\n} else {\n    statusText = \"Sem dados\";\n    statusDesc = \"Aguardando primeiras leituras\";\n    color = \"#9ca3af\"; // cinza\n}\n\nmsg.payload = {\n    statusText,\n    statusDesc,\n    color\n};\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1130,
+        "y": 240,
+        "wires": [
+            [
+                "4a0c96efd5ab419e"
+            ]
+        ]
+    },
+    {
+        "id": "4a0c96efd5ab419e",
+        "type": "ui_template",
+        "z": "112a1448c1903990",
+        "group": "ef923aff10be72e7",
+        "name": "",
+        "order": 1,
+        "width": "6",
+        "height": "4",
+        "format": "<div class=\"zen-status-card\">\n    <div class=\"zen-status-title\">Status do Ambiente</div>\n\n    <div class=\"zen-status-main\" style=\"color: {{msg.payload.color}};\">\n        {{msg.payload.statusText}}\n    </div>\n\n    <div class=\"zen-status-desc\">\n        {{msg.payload.statusDesc}}\n    </div>\n</div>\n\n<style>\n    .zen-status-card {\n        background-color: #ffffff;\n        border-radius: 12px;\n        padding: 16px 20px;\n        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);\n        font-family: sans-serif;\n        text-align: left;\n    }\n\n    .zen-status-title {\n        font-size: 0.85rem;\n        font-weight: 600;\n        color: #6b7280;\n        text-transform: uppercase;\n        letter-spacing: 0.06em;\n        margin-bottom: 8px;\n    }\n\n    .zen-status-main {\n        font-size: 1.4rem;\n        font-weight: 700;\n        margin-bottom: 4px;\n    }\n\n    .zen-status-desc {\n        font-size: 0.9rem;\n        color: #4b5563;\n    }\n</style>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1520,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "02b32b7eeb88d7ee",
+        "type": "ui_chart",
+        "z": "112a1448c1903990",
+        "name": "",
+        "group": "e8bc42e487d47ecf",
+        "order": 4,
+        "width": "6",
+        "height": "8",
+        "label": "Gráfico de Sensores Ambientais",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#d38b0d",
+            "#70c2e6",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1870,
+        "y": 320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d2a1f8e36c2ccb7b",
+        "type": "mqtt-broker",
+        "name": "MQTT ZenFlow",
+        "broker": "broker.hivemq.com",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "ef923aff10be72e7",
+        "type": "ui_group",
+        "name": "Status",
+        "tab": "9432e28ed73b47d2",
+        "order": 3,
+        "disp": true,
+        "width": 6,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "92689d23bc0157c9",
+        "type": "ui_group",
+        "name": "Header",
+        "tab": "9432e28ed73b47d2",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "e8bc42e487d47ecf",
+        "type": "ui_group",
+        "name": "Métricas",
+        "tab": "9432e28ed73b47d2",
+        "order": 1,
+        "disp": true,
+        "width": 6,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9432e28ed73b47d2",
+        "type": "ui_tab",
+        "name": "ZenFlow Sense",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "66e44b63d1723d0b",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-dashboard": "3.6.6"
+        }
+    }
+]
